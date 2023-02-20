@@ -46,7 +46,7 @@ class WhipperUI:
     BOT = None
     TABLE_FONTSIZE = "17px"
     HOME_PATH = "./%s"
-    WAITING_TIME = 60 * 10
+    WAITING_TIME = 10
     PROMPT_PATH = HOME_PATH % "prompt_master.csv"
     ICON_FILE = "icon.png"
     RESULT_FILE = HOME_PATH % "buff/"
@@ -433,16 +433,19 @@ class WhipperUI:
         return result
 
     def _submit(self, prompt, conversation_id, parent_message_id):
-        res = self.BOT.ask(prompt,
-                           conversation_id,
-                           parent_message_id)
+        res = self.BOT.ask(prompt)
+        failed = False
         while res is None:
             st.error("Process failed  will resubmit it after %d minutes" % (self.WAITING_TIME // 60))
+            st.empty()
             time.sleep(self.WAITING_TIME)
             self.BOT.reset()
             res = self.BOT.ask(prompt,
                                conversation_id,
                                parent_message_id)
+            failed = True
+        if failed:
+            st.success("Process resumed!")
         return res
 
     def on_do(self, prompt_id, data, target_column, no_explain, do_false_only):
@@ -501,21 +504,22 @@ class WhipperUI:
             i = 0
         bar_index = i * 100 // num
         progress_bar = st.progress(bar_index)
-        for prompts_input in prompts_inputs[i:]:
+        for prompts_input in prompts_inputs[i: i + 2]:
             prompt_text = "%s\n\t\t%s" % (prompt, prompts_input)
             res = self._submit(prompt_text, conversation_id, parent_message_id)
             conversation_id = self.BOT.get_conversation_id()
             parent_message_id = self.BOT.get_parent_message_id()
             if no_explain and not self.is_csv_format(res):
-                res = self.BOT.ask(
-                    "Do not include any explanation in your reply, please redo the \n\t\t%s." % prompts_input)
+                prompt_text = "Do not include any explanation in your reply, please redo the \n\t\t%s." % prompts_input
+                res = self._submit(prompt_text, conversation_id, parent_message_id)
             new_s = i * 100 // num
             if new_s > bar_index:
                 progress_bar.progress(bar_index)
                 bar_index = new_s
             i += 1
-            processed_data = processed_data.append({self.GPT_INPUT_COL: prompts_input, self.GPT_RESULT_COL: res},
-                                                   ignore_index=True)
+            new_row = pd.DataFrame([[prompts_input, res]], columns=[self.GPT_INPUT_COL, self.GPT_RESULT_COL])
+            processed_data = pd.concat([processed_data, new_row],
+                                       ignore_index=True)
             processed_data.to_csv(cache_name, encoding='utf-8-sig', index=False)
             # Create a new row for the prompts DataFrame with the current date, prompt number, and prompt text
         new_row = {"Date": datetime.now().strftime('%Y-%m-%d'),
@@ -581,7 +585,7 @@ class WhipperUI:
                               height=200)
         auth_bth, add_btn, process_btn, = st.columns(3)
         set_btn, delete_btn_cache, delete_btn_prompt = st.columns(3)
-        download_btn,_ = st.columns(2)
+        download_btn, _ = st.columns(2)
         add_btn.button('Add',
                        on_click=self.on_add,
                        args=(prompt, prompt_name))
@@ -592,7 +596,7 @@ class WhipperUI:
 
         delete_btn_prompt.button('Delete Prompt',
                                  on_click=self.on_delete_prompt,
-                                 args=(self, selected_prompt_no,))
+                                 args=(selected_prompt_no,))
 
         delete_btn_cache.button('Delete Cached result',
                                 on_click=self.on_delete_cache,

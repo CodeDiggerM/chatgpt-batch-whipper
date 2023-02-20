@@ -1,6 +1,6 @@
 streamlit
 pandas
-st-aggrid
+streamlit-aggrid
 playwright
 readline; platform_system=="Linux"
 pyreadline3; platform_system=="Windows"
