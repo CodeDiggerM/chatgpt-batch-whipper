@@ -288,9 +288,7 @@ class ChatGPT:
             .replace("STREAM_DIV_ID", self.stream_div_id)
             .replace("EOF_DIV_ID", self.eof_div_id)
         )
-
         self.page.evaluate(code)
-
         last_event_msg = ""
         start_time = time.time()
         while True:
