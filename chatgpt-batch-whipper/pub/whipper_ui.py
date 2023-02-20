@@ -189,7 +189,7 @@ class WhipperUI:
 
         return prompts_df
 
-    def _create_table(self, data, check_col=None, comment_col=None):
+    def _create_table(self, data, check_col=None, comment_col=None, pagesize=100):
         """
         Creates an Ag-Grid table from a pandas DataFrame.
 
@@ -216,7 +216,7 @@ class WhipperUI:
 
         # Configure pagination settings for the table
         gb.configure_pagination(
-            paginationPageSize=30,  # Set the number of rows per page to 100
+            paginationPageSize=pagesize,  # Set the number of rows per page to 100
             paginationAutoPageSize=False  # Disable automatic pagination
         )
         if check_col is not None:
@@ -504,7 +504,7 @@ class WhipperUI:
             i = 0
         bar_index = i * 100 // num
         progress_bar = st.progress(bar_index)
-        for prompts_input in prompts_inputs[i: i + 2]:
+        for prompts_input in prompts_inputs[i: ]:
             prompt_text = "%s\n\t\t%s" % (prompt, prompts_input)
             res = self._submit(prompt_text, conversation_id, parent_message_id)
             conversation_id = self.BOT.get_conversation_id()
@@ -605,6 +605,9 @@ class WhipperUI:
                         on_click=self.on_auth,
                         args=())
         st.markdown("[Go to chatGPT](https://chat.openai.com/chat)")
+        if data is not None:
+            st.markdown("### The input data ")
+            self._create_table(data, pagesize=10)
         show_false_only = False
         if len(result_data) > 0:
             st_title, show_false_only_cb = st.columns(2)
@@ -632,6 +635,3 @@ class WhipperUI:
                                  target_column,
                                  no_explain,
                                  show_false_only))
-        if data is not None:
-            st.markdown("### The input data ")
-            self._create_table(data)
