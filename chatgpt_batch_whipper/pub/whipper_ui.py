@@ -338,13 +338,12 @@ class WhipperUI:
             # If the prompt number doesn't exist in the DataFrame, add a new prompt with the specified text
             self.on_add(prompt_text, prompt_name=prompt_no)
             return
-
+        print(prompts_df)
         # Create a new row for the prompts DataFrame with the current date, prompt number, and prompt text
-        new_row = {"Date": datetime.now().strftime('%Y-%m-%d'), "No": prompt_no, "prompt": prompt_text}
-
-        # Update the row with the new prompt text in the DataFrame
-        prompts_df.loc[prompts_df["No"] == prompt_no] = list(new_row.values())
-
+        new_row = prompts_df.loc[prompts_df["No"] == prompt_no]
+        new_row["Date"] = datetime.now().strftime('%Y-%m-%d')
+        new_row["prompt"] = prompt_text
+        prompts_df = pd.concat([new_row, prompts_df[prompts_df["No"] != prompt_no]])
         # Save the updated prompts data to the CSV file
         prompts_df.to_csv(self.PROMPT_PATH, encoding='utf-8-sig', index=False)
 

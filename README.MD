@@ -7,10 +7,28 @@ The ChatGPT Batch Whipper is a tool designed to simplify batch jobs using ChatGP
 * Ensure continuity and coherence by submitting input data for the same prompt to the same conversation.
 * Resume the batch job from where you left off, even if you unintentionally stop the process, thanks to the tool's data saving feature.
 * Never worry about exceeding hourly submit times, as the tool waits until it can run again.
-In short, the ChatGPT Batch Whipper tool is an efficient and user-friendly way to perform batch jobs with ChatGPT. We welcome any feedback or suggestions you may have, so give it a try and see how it can improve your workflow!## Installation
+In short, the ChatGPT Batch Whipper tool is an efficient and user-friendly way to perform batch jobs with ChatGPT. We welcome any feedback or suggestions you may have, so give it a try and see how it can improve your workflow!
+Thanks to @mmabrouk some of codes were inspired and modified from his [repo](https://github.com/mmabrouk/chatgpt-wrapper).
+
+
 
 
 ## Installation
+### Use PIP command
+1. Install the latest version of this software directly from github with pip:
+```bash
+  pip install git+https://github.com/CodeDiggerM/chatgpt-batch-whipper.git
+```
+2. Go to **auth** mode. This will open up a browser window. Log in to ChatGPT in the browser window, then close the browser.
+```bash
+run_chatgpt auth
+```
+3. Start the UI
+```bash
+run_chatgpt ui
+```
+
+### Manually set up
 
 1. Clone the repo to your working directory
 ```bash
@@ -21,25 +39,25 @@ git clone https://github.com/CodeDiggerM/chatgpt-batch-whipper.git
 pip install -r requirements.txt
 ```
 
-2. Install a browser in playwright (if you haven't already).  The program will use firefox by default.
+3. Install a browser in playwright (if you haven't already).  The program will use firefox by default.
 
 ```
 playwright install firefox
 ```
 
-3. Go to the chatgpt-batch-whipper/
+4. Go to the chatgpt-batch-whipper/
 
 ```bash
-cd chatgpt-batch-whipper/
+cd chatgpt_batch_whipper/
 ````
 
-4. Run the main page by streamlit.
+5. Run the main page by streamlit.
 you can got to [streamlit](https://github.com/streamlit/streamlit) to check more about streamlit.
 
 ```bash
 streamlit run start_whipper.py
 ````
-5. Authenticate your openAI account
+6. Authenticate your openAI account
 Click the **auth** button
 <img src="documents/photos/auth1.png" style="margin-top:50px"></img>
 
@@ -49,12 +67,32 @@ It will open up an authentication page in the web browser you installed using pl
 
 ## Quickstart
 
+### Use API
+1. Grant auth from chatGPT.
+```python
+from chatgpt_batch_whipper.pub.chatgpt_wrapper import ChatGPT
+bot = ChatGPT()
+response = bot.auth()
+print(response) 
+```
+
+2. Ask the question to chatGPT
+```python
+from chatgpt_batch_whipper.pub.chatgpt_wrapper import ChatGPT
+bot = ChatGPT()
+response = bot.ask("Greeting!")
+print(response) 
+```
+
+
+### Streamlit UI
+
 Now run it to open the app!
 ```
 streamlit run streamlit_app.py
 ```
 
-### Single shoot mode
+#### Single shoot mode
 
 1. select the **Single shoot mode**.
 2. Type your prompt then click submit
@@ -63,7 +101,7 @@ streamlit run streamlit_app.py
 <img src="documents/photos/single shoot.png" style="margin-top:50px"></img>
 Here are some tips.
 
-### Fully Automatic mode
+#### Fully Automatic mode
 You can apply your prompt to multiple records in the **Fully Automatic mode**.
 
 1. Select Fully Automatic mode.
@@ -76,7 +114,7 @@ After processing. The result will appears in the **The processed result** sectio
 
 you can check the result and check the "is false" then click the **Submit** to reprocess the "failed" one.
 
-<img src=""documents/photos/Fully Automatic mode result check.png" style="margin-top:50px"></img>
+<img src="documents/photos/Fully Automatic mode result check.png" style="margin-top:50px"></img>
 
 * You can save the prompt by click **Add** button.
 * You can choose the old prompt by select **prompt list**.
