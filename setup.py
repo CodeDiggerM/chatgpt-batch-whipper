@@ -1,10 +1,32 @@
 from setuptools import find_packages, setup
+from setuptools.command.develop import develop
+from setuptools.command.install import install
+from subprocess import check_call
 
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 with open('requirements.txt') as f:
     install_requirement = f.readlines()
+
+
+class PostDevelopCommand(develop):
+    """Post-installation for development mode."""
+
+    def run(self):
+        develop.run(self)
+        check_call('playwright install firefox')
+        #check_call('cp -Rf ./chatgpt-batch-whipper ~/chatgpt-batch-whipper'.split())
+
+
+class PostInstallCommand(install):
+    """Post-installation for installation mode."""
+
+    def run(self):
+        install.run(self)
+        check_call('playwright install firefox'.split())
+        #check_call('cp -Rf ./chatgpt-batch-whipper ~/chatgpt-batch-whipper'.split())
+
 
 setup(
     name="chatGPT Bach Whipper",
@@ -28,5 +50,10 @@ setup(
             "run_chatgpt = chatgpt_batch_whipper.main:main"
         ]
     },
+    cmdclass={
+        'develop': PostDevelopCommand,
+        'install': PostInstallCommand,
+    },
+
     scripts=["postinstall.sh"],
 )
